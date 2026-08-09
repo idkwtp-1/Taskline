@@ -1,0 +1,188 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* --- LIGHT MODE: Clean Crisp Paper + Deep Indigo Violet --- */
+    --bg-base: 220 20% 97%;                   /* Crisp light background */
+    --bg-surface: 0 0% 100%;                  /* Pure white surface */
+    --bg-surface-dim: 220 14% 94%;
+    --bg-surface-bright: 0 0% 100%;
+    --bg-surface-container-lowest: 0 0% 100%;
+    --bg-surface-container-low: 220 14% 96%;
+    --bg-surface-container: 220 14% 95%;      /* Layered container */
+    --bg-surface-container-high: 220 13% 90%;
+    --bg-surface-container-highest: 220 13% 85%;
+    --bg-surface-glass: 0 0% 100% / 0.88;     /* High-opacity frosted glass */
+
+    --text-primary: 222 47% 11%;             /* High-contrast slate header */
+    --text-secondary: 215 16% 38%;           /* Muted body text */
+    --text-muted: 215 16% 60%;               /* Subtle captions */
+    --text-inverse: 210 40% 98%;
+
+    --border-color: 220 13% 86%;             /* Subtle border stroke */
+    --border-variant: 220 13% 80%;
+    --border-glass: 220 13% 86% / 0.6;       /* Translucent glass border */
+
+    --primary: 243 75% 59%;                  /* Deep Indigo Violet (#4f46e5) */
+    --on-primary: 0 0% 100%;
+    --primary-container: 243 75% 59%;
+    --on-primary-container: 0 0% 100%;
+
+    --secondary: 240 5% 46%;
+    --on-secondary: 0 0% 100%;
+    --secondary-container: 240 5% 92%;
+    --on-secondary-container: 240 6% 10%;
+
+    --tertiary: 38 92% 50%;                 /* Warm Amber (Medium priority) */
+    --on-tertiary: 0 0% 100%;
+    --tertiary-container: 38 92% 95%;
+
+    --error: 346 84% 55%;                    /* Vivid Crimson (High priority) */
+    --on-error: 0 0% 100%;
+    --error-container: 346 84% 95%;
+    
+    --glow-shadow: 0 8px 30px -4px rgba(79, 70, 229, 0.22);
+  }
+
+  .dark {
+    /* --- DARK MODE: Deep Obsidian Graphite + Electric Neon Indigo --- */
+    --bg-base: 224 25% 6%;                    /* Deep obsidian background (#0a0d14) */
+    --bg-surface: 224 20% 10%;                /* Dark slate surface */
+    --bg-surface-dim: 224 20% 8%;
+    --bg-surface-bright: 224 15% 18%;
+    --bg-surface-container-lowest: 224 25% 4%;
+    --bg-surface-container-low: 224 20% 8%;
+    --bg-surface-container: 224 20% 12%;      /* Elevated container */
+    --bg-surface-container-high: 224 18% 16%;
+    --bg-surface-container-highest: 224 16% 20%;
+    --bg-surface-glass: 224 20% 10% / 0.75;   /* Obsidian frosted glass */
+
+    --text-primary: 210 40% 98%;             /* Crisp white header text */
+    --text-secondary: 215 20% 65%;           /* Silver secondary text */
+    --text-muted: 215 16% 45%;               /* Dimmed text */
+    --text-inverse: 222 47% 11%;
+
+    --border-color: 224 15% 20%;             /* Dark border */
+    --border-variant: 224 15% 26%;
+    --border-glass: 255 100% 100% / 0.08;    /* Ultra-subtle glass stroke */
+
+    --primary: 239 84% 67%;                  /* Vivid Electric Indigo (#6366f1) */
+    --on-primary: 0 0% 100%;
+    --primary-container: 239 84% 67%;
+    --on-primary-container: 0 0% 100%;
+
+    --secondary: 215 20% 65%;
+    --on-secondary: 224 25% 6%;
+    --secondary-container: 224 18% 18%;
+    --on-secondary-container: 210 40% 98%;
+
+    --tertiary: 38 92% 55%;                 /* Warm Amber */
+    --on-tertiary: 224 25% 6%;
+    --tertiary-container: 38 92% 15%;
+
+    --error: 346 84% 65%;                    /* Electric Crimson */
+    --on-error: 0 0% 100%;
+    --error-container: 346 84% 15%;
+
+    --glow-shadow: 0 0 35px -5px rgba(99, 102, 241, 0.35);
+  }
+
+  body {
+    background-color: hsl(var(--bg-base));
+    color: hsl(var(--text-primary));
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 1;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+/* Custom scrollbar styling for technical UI feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border-color));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--border-variant));
+}
+
+/* Animated Strike-Through Line */
+.line-through-animated {
+  position: relative;
+  display: inline-block;
+}
+
+.line-through-animated::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.65;
+  transform: translateY(-50%) scaleX(1);
+  transform-origin: left center;
+  transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Ripple Pulse Animation for Checkboxes */
+@keyframes ripple-pulse {
+  0% {
+    box-shadow: 0 0 0 0px hsl(var(--primary) / 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 14px hsl(var(--primary) / 0);
+  }
+}
+
+.animate-ripple {
+  animation: ripple-pulse 0.5s ease-out;
+}
+
+/* Border Beam Animation */
+.border-beam-active {
+  position: relative;
+}
+
+.border-beam-active::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from 0deg, transparent 70%, hsl(var(--primary)), transparent 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: spin-beam 4s linear infinite;
+}
+
+@keyframes spin-beam {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

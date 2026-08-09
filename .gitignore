@@ -1,0 +1,4 @@
+webview_data/
+launcher.log
+__pycache__/
+*.pyc
