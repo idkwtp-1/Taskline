@@ -19,7 +19,7 @@ export function BottomNav({ currentTab, onSelectTab, onNewTask }) {
       </button>
 
       {/* Bottom Navigation Bar (Mobile) */}
-      <nav className="fixed bottom-0 left-0 w-full flex justify-around items-center h-16 bg-surface-container-low border-t border-outline-variant shadow-lg z-50 md:hidden">
+      <nav className="fixed bottom-0 left-0 w-full flex justify-around items-center h-16 pb-[env(safe-area-inset-bottom,0px)] bg-surface-glass/95 backdrop-blur-xl border-t border-border-glass shadow-2xl z-50 md:hidden">
         {navItems.map((item) => {
           const isActive = currentTab === item.id;
           return (

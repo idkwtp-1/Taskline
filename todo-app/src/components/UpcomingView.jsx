@@ -51,7 +51,7 @@ export function UpcomingView({
         </div>
         <button
           onClick={() => onNewTask({ type: 'specific-day', dueDate: selectedDate || todayStr })}
-          className="px-4 py-2 bg-primary text-on-primary rounded-lg text-label-md font-label-md font-bold hover:opacity-90 transition-opacity flex items-center gap-1.5 shadow-glow"
+          className="hidden sm:flex px-4 py-2 bg-primary text-on-primary rounded-lg text-label-md font-label-md font-bold hover:opacity-90 transition-opacity items-center gap-1.5 shadow-glow"
         >
           <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span>
           Schedule Task
@@ -73,7 +73,7 @@ export function UpcomingView({
             </button>
           )}
         </div>
-        <div className="grid grid-cols-7 gap-2.5 overflow-x-auto pb-2">
+        <div className="flex gap-2.5 overflow-x-auto pb-2.5 md:grid md:grid-cols-7 snap-x">
           {upcomingDays.map(day => {
             const isSelected = selectedDate === day.dateStr;
             const count = taskCountByDate[day.dateStr] || 0;
@@ -82,7 +82,7 @@ export function UpcomingView({
               <button
                 key={day.dateStr}
                 onClick={() => setSelectedDate(isSelected ? null : day.dateStr)}
-                className={`p-3 rounded-xl border text-center transition-all duration-200 flex flex-col items-center justify-between min-w-[75px] backdrop-blur-md ${
+                className={`p-3 rounded-xl border text-center transition-all duration-200 flex flex-col items-center justify-between min-w-[70px] shrink-0 snap-start backdrop-blur-md ${
                   isSelected
                     ? 'bg-primary text-on-primary border-primary shadow-glow scale-[1.02]'
                     : day.isToday

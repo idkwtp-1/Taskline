@@ -68,8 +68,8 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
       {/* Backdrop click to close */}
       <div className="absolute inset-0" onClick={onClose} />
 
-      {/* Glassmorphic Slide-Over Panel */}
-      <div className="relative w-full max-w-lg bg-surface-glass backdrop-blur-2xl border-l border-border-glass h-full shadow-2xl flex flex-col z-10 overflow-y-auto">
+      {/* Glassmorphic Slide-Over Panel / Mobile Bottom Sheet */}
+      <div className="relative w-full sm:max-w-lg bg-surface-glass backdrop-blur-2xl border-l border-border-glass h-full shadow-2xl flex flex-col z-10 overflow-y-auto pb-[env(safe-area-inset-bottom,16px)]">
         {/* Panel Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-border-glass bg-surface/40">
           <h2 className="text-headline-md font-headline-md text-on-surface font-bold flex items-center gap-2">

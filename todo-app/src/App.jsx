@@ -129,11 +129,11 @@ export default function App() {
             onToggleTheme={toggleTheme}
           />
 
-          {/* Close App Header Trigger */}
+          {/* Close App Header Trigger (Desktop Only) */}
           <button
             onClick={() => setIsExitModalOpen(true)}
             aria-label="Close application"
-            className="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-xl transition-all duration-200 border border-outline-variant/40 focus-visible:ring-2 focus-visible:ring-error focus-visible:outline-none cursor-pointer"
+            className="hidden md:flex p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-xl transition-all duration-200 border border-outline-variant/40 focus-visible:ring-2 focus-visible:ring-error focus-visible:outline-none cursor-pointer"
             title="Close Application (Esc)"
           >
             <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>

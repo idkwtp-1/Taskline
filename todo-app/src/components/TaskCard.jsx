@@ -73,7 +73,7 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }) {
         </div>
 
         {/* Quick Actions */}
-        <div className="opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-within:opacity-100 transition-opacity flex items-center gap-1 shrink-0 z-10">
+        <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-within:opacity-100 transition-opacity flex items-center gap-1 shrink-0 z-10">
           <button
             onClick={() => onEdit(task)}
             aria-label={`Edit task "${task.title}"`}
@@ -193,7 +193,7 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }) {
       </div>
 
       {/* Quick Actions */}
-      <div className="opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-within:opacity-100 transition-opacity flex items-center gap-1 shrink-0 z-10">
+      <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-within:opacity-100 transition-opacity flex items-center gap-1 shrink-0 z-10">
         <button
           onClick={() => onEdit(task)}
           aria-label={`Edit task "${task.title}"`}
