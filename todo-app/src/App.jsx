@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTasks } from './hooks/useTasks';
 import { TodayView } from './components/TodayView';
 import { UpcomingView } from './components/UpcomingView';
@@ -25,12 +25,15 @@ export default function App() {
   });
 
   useEffect(() => {
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('taskline-theme', 'dark');
+      if (metaThemeColor) metaThemeColor.setAttribute('content', '#11131a');
     } else {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('taskline-theme', 'light');
+      if (metaThemeColor) metaThemeColor.setAttribute('content', '#ffffff');
     }
   }, [isDarkMode]);
 
@@ -76,24 +79,24 @@ export default function App() {
   } = useTasks();
 
   // Task Editor Handlers
-  const handleOpenNewTask = (initialValues = {}) => {
+  const handleOpenNewTask = useCallback((initialValues = {}) => {
     setTaskToEdit(null);
     setEditorInitialValues(initialValues);
     setIsEditorOpen(true);
-  };
+  }, []);
 
-  const handleOpenEditTask = (task) => {
+  const handleOpenEditTask = useCallback((task) => {
     setTaskToEdit(task);
     setIsEditorOpen(true);
-  };
+  }, []);
 
-  const handleSaveTask = async (taskData) => {
+  const handleSaveTask = useCallback(async (taskData) => {
     if (taskData.id) {
       await updateTask(taskData.id, taskData);
     } else {
       await addTask(taskData);
     }
-  };
+  }, [updateTask, addTask]);
 
   return (
     <div className="min-h-screen bg-background text-on-background flex flex-col font-sans selection:bg-primary/30">

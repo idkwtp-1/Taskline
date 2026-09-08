@@ -8,9 +8,19 @@ export function RadialTaskGauge({ completedCount = 0, totalCount = 0, size = 96 
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="flex items-center gap-4 bg-surface-glass backdrop-blur-xl border border-border-glass p-3.5 rounded-2xl shadow-lg">
+    <div
+      role="status"
+      aria-live="polite"
+      aria-label={`Task progress: ${completedCount} of ${totalCount} tasks completed (${percentage}%)`}
+      className="flex items-center gap-4 bg-surface-glass backdrop-blur-xl border border-border-glass p-3.5 rounded-2xl shadow-lg"
+    >
       <div className="relative flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
-        <svg className="transform -rotate-90 w-full h-full" viewBox="0 0 100 100">
+        <svg
+          role="img"
+          aria-label={`${percentage}% completed gauge`}
+          className="transform -rotate-90 w-full h-full"
+          viewBox="0 0 100 100"
+        >
           <defs>
             <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="hsl(var(--primary))" />

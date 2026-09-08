@@ -4,8 +4,8 @@ export function IosInstallBanner() {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-    // Detect iOS / Safari and check if already running in standalone PWA mode
-    const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    // Detect iOS / iPadOS Safari and check if already running in standalone PWA mode
+    const isIos = (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent))) && !window.MSStream;
     const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
     const isDismissed = localStorage.getItem('taskline-ios-banner-dismissed') === 'true';
 
@@ -28,7 +28,7 @@ export function IosInstallBanner() {
           ios_share
         </span>
         <div className="text-body-sm">
-          <span className="font-semibold">Install TaskLine on iPhone: </span>
+          <span className="font-semibold">Install TaskLine on iOS / iPad: </span>
           <span>
             Tap <span className="font-bold underline">Share</span> below then select{' '}
             <span className="font-bold underline">"Add to Home Screen"</span> for full PWA experience.

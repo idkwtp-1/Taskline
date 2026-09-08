@@ -1,8 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { memo, useRef, useState } from 'react';
 import { formatDisplayTime, formatShortDate } from '../lib/dateUtils';
 import { TactileAnimatedCheckbox } from './TactileAnimatedCheckbox';
 
-export function TaskCard({ task, onToggle, onEdit, onDelete }) {
+export const TaskCard = memo(function TaskCard({ task, onToggle, onEdit, onDelete }) {
   const cardRef = useRef(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
