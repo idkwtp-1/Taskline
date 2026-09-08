@@ -213,4 +213,4 @@ export const TaskCard = memo(function TaskCard({ task, onToggle, onEdit, onDelet
       </div>
     </div>
   );
-}
+});
