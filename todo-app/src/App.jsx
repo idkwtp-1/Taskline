@@ -73,6 +73,7 @@ export default function App() {
     updateTask,
     toggleTask,
     deleteTask,
+    slotTaskIntoTime,
     exportTasksJSON,
     importTasksJSON,
     clearAllTasks,
@@ -167,6 +168,7 @@ export default function App() {
               onEdit={handleOpenEditTask}
               onDelete={deleteTask}
               onNewTask={handleOpenNewTask}
+              onSlotTask={slotTaskIntoTime}
             />
           )}
 

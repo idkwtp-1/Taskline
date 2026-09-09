@@ -10,6 +10,7 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
   const [category, setCategory] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [dueTime, setDueTime] = useState('');
+  const [duration, setDuration] = useState(45); // in minutes
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
@@ -20,6 +21,7 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
       setCategory(taskToEdit.category || '');
       setDueDate(taskToEdit.dueDate || '');
       setDueTime(taskToEdit.dueTime || '');
+      setDuration(taskToEdit.duration || 45);
       setNotes(taskToEdit.notes || '');
     } else {
       setTitle(initialValues.title || '');
@@ -28,6 +30,7 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
       setCategory(initialValues.category || '');
       setDueDate(initialValues.dueDate || (initialValues.type === 'specific-day' ? todayStr : ''));
       setDueTime(initialValues.dueTime || '');
+      setDuration(initialValues.duration || 45);
       setNotes(initialValues.notes || '');
     }
   }, [taskToEdit, initialValues, isOpen, todayStr]);
@@ -57,6 +60,7 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
       category: category.trim(),
       dueDate: type === 'specific-day' ? (dueDate || todayStr) : dueDate || null,
       dueTime: dueTime || null,
+      duration: Number(duration) || 45,
       notes: notes.trim(),
     });
 
@@ -210,6 +214,41 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
               />
             </div>
           </div>
+
+          {/* Duration Selector (for visual Day-Blocker blocks) */}
+          {dueTime && (
+            <div className="animate-fade-in">
+              <label className="block text-label-md font-label-md text-on-surface mb-1.5 font-semibold flex items-center justify-between">
+                <span>Estimated Duration</span>
+                <span className="text-mono-label text-primary font-mono font-bold">
+                  {duration >= 60 ? `${Math.floor(duration / 60)}h${duration % 60 ? ` ${duration % 60}m` : ''}` : `${duration} mins`}
+                </span>
+              </label>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {[
+                  { label: '15m', value: 15 },
+                  { label: '30m', value: 30 },
+                  { label: '45m', value: 45 },
+                  { label: '1h', value: 60 },
+                  { label: '1.5h', value: 90 },
+                  { label: '2h', value: 120 },
+                ].map(item => (
+                  <button
+                    key={item.value}
+                    type="button"
+                    onClick={() => setDuration(item.value)}
+                    className={`flex-1 py-1.5 px-2 rounded-xl border text-mono-label font-mono transition-all text-center cursor-pointer ${
+                      duration === item.value
+                        ? 'bg-primary text-on-primary border-primary shadow-glow font-bold scale-[1.02]'
+                        : 'bg-surface-container-low border-border-glass text-on-surface-variant hover:bg-surface-container'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Notes / Description */}
           <div>

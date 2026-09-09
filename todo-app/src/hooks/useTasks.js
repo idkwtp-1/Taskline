@@ -74,6 +74,7 @@ export function useTasks() {
       completedAt: null,
       dueDate: taskData.dueDate || (taskData.type === 'specific-day' ? todayStr : null),
       dueTime: taskData.dueTime || null,
+      duration: Number(taskData.duration) || 45,
       createdAt: new Date().toISOString(),
       lastResetDate: getTodayString(),
       notes: taskData.notes?.trim() || '',
@@ -148,6 +149,15 @@ export function useTasks() {
     await db.tasks.clear();
   }, []);
 
+  const slotTaskIntoTime = useCallback(async (id, timeStr, duration = 45) => {
+    return await db.tasks.update(id, {
+      dueTime: timeStr,
+      duration: Number(duration) || 45,
+      dueDate: todayStr,
+      type: 'specific-day',
+    });
+  }, [todayStr]);
+
   return {
     allTasks,
     todayTasks,
@@ -160,6 +170,7 @@ export function useTasks() {
     updateTask,
     toggleTask,
     deleteTask,
+    slotTaskIntoTime,
     exportTasksJSON,
     importTasksJSON,
     clearAllTasks,
