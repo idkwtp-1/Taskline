@@ -46,11 +46,43 @@ except Exception:
     pass
 
 
+import shutil
+
 def ensure_dist_built():
     index_html = os.path.join(dist_dir, "index.html")
-    if not os.path.exists(index_html):
-        print("[TaskLine] Building production bundle...")
+    needs_build = not os.path.exists(index_html)
+    if not needs_build:
+        dist_mtime = os.path.getmtime(index_html)
+        src_dir = os.path.join(app_dir, "src")
+        for root, _, files in os.walk(src_dir):
+            for file in files:
+                filepath = os.path.join(root, file)
+                try:
+                    if os.path.getmtime(filepath) > dist_mtime:
+                        needs_build = True
+                        break
+                except OSError:
+                    pass
+            if needs_build:
+                break
+
+    if needs_build:
+        print("[TaskLine] Code changes detected or bundle missing. Building production bundle...")
         subprocess.run("npm run build", shell=True, cwd=app_dir, check=True)
+
+
+def cleanup_stale_cache():
+    # Clear HTTP and script caches so webview always renders the latest code bundle,
+    # while strictly preserving IndexedDB and Local Storage where user tasks reside.
+    default_dir = os.path.join(project_dir, "webview_data", "EBWebView", "Default")
+    cache_folders = ["Cache", "Code Cache", "Service Worker"]
+    for folder in cache_folders:
+        target = os.path.join(default_dir, folder)
+        if os.path.exists(target):
+            try:
+                shutil.rmtree(target, ignore_errors=True)
+            except Exception as e:
+                print(f"[TaskLine] Note cleaning {folder}: {e}")
 
 
 def get_free_port():
@@ -220,6 +252,7 @@ def main():
     global window
     try:
         ensure_dist_built()
+        cleanup_stale_cache()
 
         port = get_free_port()
         start_instant_server(port)
