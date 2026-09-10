@@ -12,7 +12,8 @@ export const TaskCard = memo(function TaskCard({ task, onToggle, onEdit, onDelet
   const isMediumPriority = task.priority === 'medium';
 
   const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
+    // Only compute spotlight on fine pointer devices (desktop mouse)
+    if (!cardRef.current || (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches)) return;
     const rect = cardRef.current.getBoundingClientRect();
     setMousePos({
       x: e.clientX - rect.left,
@@ -27,21 +28,21 @@ export const TaskCard = memo(function TaskCard({ task, onToggle, onEdit, onDelet
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={`group relative rounded-xl p-4 transition-all duration-300 border border-outline-variant/60 bg-surface-glass backdrop-blur-md hover:-translate-y-0.5 hover:shadow-glow flex items-start gap-3 overflow-hidden ${
+        className={`group relative rounded-xl p-3.5 sm:p-4 transition-all duration-300 border border-outline-variant/60 bg-surface-glass backdrop-blur-md hover:-translate-y-0.5 hover:shadow-glow flex items-start gap-3 overflow-hidden ${
           task.completed ? 'opacity-50' : 'opacity-90 hover:opacity-100'
         }`}
       >
-        {/* Dynamic Cursor Spotlight Overlay */}
+        {/* Dynamic Cursor Spotlight Overlay (Desktop mouse only) */}
         {isHovered && (
           <div
-            className="pointer-events-none absolute -inset-px transition-opacity duration-300 opacity-100 z-0"
+            className="pointer-events-none absolute -inset-px transition-opacity duration-300 opacity-100 z-0 hidden sm:block"
             style={{
               background: `radial-gradient(280px circle at ${mousePos.x}px ${mousePos.y}px, hsl(var(--primary) / 0.1), transparent 80%)`,
             }}
           />
         )}
 
-        <div className="pt-0.5 z-10">
+        <div className="pt-0.5 z-10 shrink-0">
           <TactileAnimatedCheckbox
             checked={task.completed}
             onChange={() => onToggle(task.id)}
@@ -57,9 +58,9 @@ export const TaskCard = memo(function TaskCard({ task, onToggle, onEdit, onDelet
           </h3>
 
           {(task.category || task.notes) && (
-            <div className="flex flex-wrap items-center gap-2 mt-1.5">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1.5">
               {task.category && (
-                <span className="text-mono-label font-mono-label text-on-surface-variant bg-surface-container-highest px-2 py-0.5 rounded-full border border-outline/30">
+                <span className="text-mono-label font-mono-label text-on-surface-variant bg-surface-container-highest px-2 py-0.5 rounded-full border border-outline/30 text-[11px]">
                   #{task.category}
                 </span>
               )}
@@ -72,44 +73,48 @@ export const TaskCard = memo(function TaskCard({ task, onToggle, onEdit, onDelet
           )}
         </div>
 
-        {/* Quick Actions */}
+        {/* Quick Actions (Always touch-friendly on mobile, hover-revealed on desktop) */}
         <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-within:opacity-100 transition-opacity flex items-center gap-1 shrink-0 z-10">
           <button
             onClick={() => onEdit(task)}
             aria-label={`Edit task "${task.title}"`}
-            className="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+            className="min-h-[36px] min-w-[36px] p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none flex items-center justify-center cursor-pointer"
             title="Edit task"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>edit</span>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }} aria-hidden="true">
+              edit
+            </span>
           </button>
           <button
             onClick={() => onDelete(task.id)}
             aria-label={`Delete task "${task.title}"`}
-            className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-error focus-visible:outline-none"
+            className="min-h-[36px] min-w-[36px] p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-error focus-visible:outline-none flex items-center justify-center cursor-pointer"
             title="Delete task"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>delete</span>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }} aria-hidden="true">
+              delete
+            </span>
           </button>
         </div>
       </div>
     );
   }
 
-  // Priority & Scheduled Task Card (Magic Spotlight Card + Border Beam)
+  // Priority & Scheduled Task Card (Spotlight Card + Border Beam)
   return (
     <div
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`group relative rounded-xl p-4 transition-all duration-300 border border-outline-variant bg-surface-container/90 backdrop-blur-md hover:-translate-y-0.5 hover:shadow-glow flex items-start gap-3.5 overflow-hidden ${
+      className={`group relative rounded-xl p-3.5 sm:p-4 transition-all duration-300 border border-outline-variant bg-surface-container/90 backdrop-blur-md hover:-translate-y-0.5 hover:shadow-glow flex items-start gap-3 sm:gap-3.5 overflow-hidden ${
         isHighPriority ? 'border-beam-active' : ''
       } ${task.completed ? 'opacity-65' : ''}`}
     >
-      {/* Dynamic Cursor Spotlight Overlay */}
+      {/* Dynamic Cursor Spotlight Overlay (Desktop mouse only) */}
       {isHovered && (
         <div
-          className="pointer-events-none absolute -inset-px transition-opacity duration-300 opacity-100 z-0"
+          className="pointer-events-none absolute -inset-px transition-opacity duration-300 opacity-100 z-0 hidden sm:block"
           style={{
             background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, hsl(var(--primary) / 0.14), transparent 80%)`,
           }}
@@ -125,7 +130,7 @@ export const TaskCard = memo(function TaskCard({ task, onToggle, onEdit, onDelet
       )}
 
       {/* Animated SVG Checkbox */}
-      <div className="pt-0.5 z-10">
+      <div className="pt-0.5 z-10 shrink-0">
         <TactileAnimatedCheckbox
           checked={task.completed}
           onChange={() => onToggle(task.id)}
@@ -147,68 +152,72 @@ export const TaskCard = memo(function TaskCard({ task, onToggle, onEdit, onDelet
           </p>
         )}
 
-        <div className="flex flex-wrap items-center gap-2 mt-2.5">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-2 sm:mt-2.5">
           {/* Priority Badge */}
           {isHighPriority && (
-            <span className="text-mono-label font-mono-label font-bold text-error bg-error/10 border border-error/20 px-2 py-0.5 rounded-full flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-error animate-ping" />
+            <span className="text-mono-label font-mono-label font-bold text-error bg-error/10 border border-error/20 px-2 py-0.5 rounded-full flex items-center gap-1 text-[10px] sm:text-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-error motion-safe:animate-ping" aria-hidden="true" />
               HIGH PRIORITY
             </span>
           )}
           {isMediumPriority && (
-            <span className="text-mono-label font-mono-label font-bold text-tertiary bg-tertiary/10 border border-tertiary/20 px-2 py-0.5 rounded-full flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-tertiary" />
+            <span className="text-mono-label font-mono-label font-bold text-tertiary bg-tertiary/10 border border-tertiary/20 px-2 py-0.5 rounded-full flex items-center gap-1 text-[10px] sm:text-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-tertiary" aria-hidden="true" />
               MEDIUM PRIORITY
             </span>
           )}
 
           {/* Type Badge / Daily Pill */}
           {task.type === 'daily' && (
-            <span className="text-mono-label font-mono-label font-bold text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full flex items-center gap-1">
-              <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>sync</span> DAILY
+            <span className="text-mono-label font-mono-label font-bold text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full flex items-center gap-1 text-[10px] sm:text-xs">
+              <span className="material-symbols-outlined" style={{ fontSize: '12px' }} aria-hidden="true">sync</span> DAILY
             </span>
           )}
 
           {/* Category Badge */}
           {task.category && (
-            <span className="text-mono-label font-mono-label text-on-surface-variant bg-surface-container-highest px-2 py-0.5 rounded-full border border-outline/30">
+            <span className="text-mono-label font-mono-label text-on-surface-variant bg-surface-container-highest px-2 py-0.5 rounded-full border border-outline/30 text-[10px] sm:text-xs">
               #{task.category}
             </span>
           )}
 
           {/* Time Badge */}
           {task.dueTime && (
-            <span className="text-label-md font-label-md text-on-surface-variant bg-surface/50 border border-outline/30 px-2 py-0.5 rounded-full flex items-center gap-1 font-mono">
-              <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>schedule</span> {formatDisplayTime(task.dueTime)}
+            <span className="text-label-md font-label-md text-on-surface-variant bg-surface/50 border border-outline/30 px-2 py-0.5 rounded-full flex items-center gap-1 font-mono text-[11px] sm:text-xs">
+              <span className="material-symbols-outlined" style={{ fontSize: '13px' }} aria-hidden="true">schedule</span> {formatDisplayTime(task.dueTime)}
             </span>
           )}
 
           {/* Date Badge */}
           {task.dueDate && task.type === 'specific-day' && (
-            <span className="text-label-md font-label-md text-on-surface-variant bg-surface/50 border border-outline/30 px-2 py-0.5 rounded-full flex items-center gap-1 font-mono">
-              <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>calendar_month</span> {formatShortDate(task.dueDate)}
+            <span className="text-label-md font-label-md text-on-surface-variant bg-surface/50 border border-outline/30 px-2 py-0.5 rounded-full flex items-center gap-1 font-mono text-[11px] sm:text-xs">
+              <span className="material-symbols-outlined" style={{ fontSize: '13px' }} aria-hidden="true">calendar_month</span> {formatShortDate(task.dueDate)}
             </span>
           )}
         </div>
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions (Touch-friendly minimum tap targets) */}
       <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-within:opacity-100 transition-opacity flex items-center gap-1 shrink-0 z-10">
         <button
           onClick={() => onEdit(task)}
           aria-label={`Edit task "${task.title}"`}
-          className="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+          className="min-h-[36px] min-w-[36px] p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none flex items-center justify-center cursor-pointer"
           title="Edit task"
         >
-          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>edit</span>
+          <span className="material-symbols-outlined" style={{ fontSize: '18px' }} aria-hidden="true">
+            edit
+          </span>
         </button>
         <button
           onClick={() => onDelete(task.id)}
           aria-label={`Delete task "${task.title}"`}
-          className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-error focus-visible:outline-none"
+          className="min-h-[36px] min-w-[36px] p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-error focus-visible:outline-none flex items-center justify-center cursor-pointer"
           title="Delete task"
         >
-          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
+          <span className="material-symbols-outlined" style={{ fontSize: '18px' }} aria-hidden="true">
+            delete
+          </span>
         </button>
       </div>
     </div>

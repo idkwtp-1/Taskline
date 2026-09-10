@@ -107,6 +107,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background text-on-background flex flex-col font-sans selection:bg-primary/30">
+      {/* Skip to Main Content Link (Vercel Guidelines / A11y) */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-on-primary focus:rounded-xl focus:shadow-glow focus:font-bold focus:outline-none"
+      >
+        Skip to main content
+      </a>
+
       {/* iOS Safari Install Banner */}
       <IosInstallBanner />
 
@@ -114,7 +122,7 @@ export default function App() {
       <header className="sticky top-0 z-30 h-[65px] border-b border-border-glass bg-surface-glass backdrop-blur-xl flex justify-between items-center px-margin_mobile md:px-margin_desktop">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-primary text-on-primary flex items-center justify-center font-bold shadow-glow">
-            <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '22px' }} aria-hidden="true">
               check_box
             </span>
           </div>
@@ -129,7 +137,7 @@ export default function App() {
             aria-label="Create a new task"
             className="hidden sm:flex px-4 py-2 bg-primary text-on-primary rounded-xl text-label-md font-label-md font-bold hover:opacity-90 transition-opacity items-center gap-1.5 shadow-glow focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none cursor-pointer"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }} aria-hidden="true">add</span>
             New Task
           </button>
 
@@ -177,7 +185,11 @@ export default function App() {
         />
 
         {/* Main Content Area */}
-        <main className="flex-1 ml-0 md:ml-sidebar_width p-margin_mobile md:p-margin_desktop pb-24 md:pb-12 overflow-y-auto">
+        <main
+          id="main-content"
+          tabIndex="-1"
+          className="flex-1 ml-0 md:ml-sidebar_width p-margin_mobile md:p-margin_desktop pb-24 md:pb-12 overflow-y-auto outline-none"
+        >
           {currentTab === 'today' && (
             <TodayView
               todayPriorityTasks={todayPriorityTasks}
