@@ -13,6 +13,13 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
   const [duration, setDuration] = useState(45); // in minutes
   const [notes, setNotes] = useState('');
 
+  // Recurrence states
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrenceType, setRecurrenceType] = useState('interval'); // 'interval' | 'daily' | 'weekly' | 'weekdays'
+  const [recurrenceInterval, setRecurrenceInterval] = useState(2);
+  const [recurrenceWeekdays, setRecurrenceWeekdays] = useState([1, 3, 5]); // Mon, Wed, Fri
+  const [recurrenceStartDate, setRecurrenceStartDate] = useState(todayStr);
+
   useEffect(() => {
     if (taskToEdit) {
       setTitle(taskToEdit.title || '');
@@ -23,6 +30,13 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
       setDueTime(taskToEdit.dueTime || '');
       setDuration(taskToEdit.duration || 45);
       setNotes(taskToEdit.notes || '');
+
+      const hasRecurrence = Boolean(taskToEdit.isRecurrenceTemplate || (taskToEdit.recurrenceType && taskToEdit.recurrenceType !== 'none'));
+      setIsRecurring(hasRecurrence);
+      setRecurrenceType(taskToEdit.recurrenceType || 'interval');
+      setRecurrenceInterval(Number(taskToEdit.recurrenceInterval) || 2);
+      setRecurrenceWeekdays(taskToEdit.recurrenceWeekdays || [1, 3, 5]);
+      setRecurrenceStartDate(taskToEdit.recurrenceStartDate || todayStr);
     } else {
       setTitle(initialValues.title || '');
       setType(initialValues.type || 'one-time');
@@ -32,6 +46,13 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
       setDueTime(initialValues.dueTime || '');
       setDuration(initialValues.duration || 45);
       setNotes(initialValues.notes || '');
+
+      const hasRecurrence = Boolean(initialValues.isRecurrenceTemplate || (initialValues.recurrenceType && initialValues.recurrenceType !== 'none'));
+      setIsRecurring(hasRecurrence);
+      setRecurrenceType(initialValues.recurrenceType && initialValues.recurrenceType !== 'none' ? initialValues.recurrenceType : 'interval');
+      setRecurrenceInterval(Number(initialValues.recurrenceInterval) || 2);
+      setRecurrenceWeekdays(initialValues.recurrenceWeekdays || [1, 3, 5]);
+      setRecurrenceStartDate(initialValues.recurrenceStartDate || todayStr);
     }
   }, [taskToEdit, initialValues, isOpen, todayStr]);
 
@@ -48,6 +69,12 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
 
   if (!isOpen) return null;
 
+  const toggleWeekday = (dayNum) => {
+    setRecurrenceWeekdays(prev =>
+      prev.includes(dayNum) ? prev.filter(d => d !== dayNum) : [...prev, dayNum].sort()
+    );
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title.trim()) return;
@@ -55,13 +82,18 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
     onSave({
       id: taskToEdit?.id,
       title: title.trim(),
-      type,
+      type: isRecurring ? 'specific-day' : type,
       priority,
       category: category.trim(),
       dueDate: type === 'specific-day' ? (dueDate || todayStr) : dueDate || null,
       dueTime: dueTime || null,
       duration: Number(duration) || 45,
       notes: notes.trim(),
+      recurrenceType: isRecurring ? recurrenceType : 'none',
+      recurrenceInterval: isRecurring ? Number(recurrenceInterval) || 1 : 1,
+      recurrenceWeekdays: isRecurring ? recurrenceWeekdays : [],
+      recurrenceStartDate: isRecurring ? (recurrenceStartDate || todayStr) : null,
+      isRecurrenceTemplate: isRecurring,
     });
 
     onClose();
@@ -72,7 +104,7 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
       {/* Backdrop click to close */}
       <div className="absolute inset-0" onClick={onClose} />
 
-      {/* Glassmorphic Slide-Over Panel / Mobile Bottom Sheet */}
+      {/* Slide-Over Drawer */}
       <div className="relative w-full sm:max-w-lg bg-surface-glass backdrop-blur-2xl border-l border-border-glass h-full shadow-2xl flex flex-col z-10 overflow-y-auto pb-[env(safe-area-inset-bottom,16px)]">
         {/* Panel Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-border-glass bg-surface/40">
@@ -85,7 +117,7 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
           <button
             onClick={onClose}
             aria-label="Close task editor"
-            className="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+            className="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none cursor-pointer"
             title="Close"
           >
             <span className="material-symbols-outlined">close</span>
@@ -134,7 +166,7 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
                       : 'bg-surface-container-low border-border-glass text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
                   }`}
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px' }} aria-hidden="true">
                     {item.icon}
                   </span>
                   <span>{item.label}</span>
@@ -250,6 +282,92 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
             </div>
           )}
 
+          {/* Recurrence Settings Section */}
+          <div className="bg-surface-container-low/70 border border-border-glass rounded-2xl p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary" style={{ fontSize: '20px' }} aria-hidden="true">
+                  repeat
+                </span>
+                <span className="text-sm font-semibold text-on-surface">Repeat Pattern</span>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isRecurring}
+                  onChange={(e) => setIsRecurring(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-10 h-5 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary" />
+              </label>
+            </div>
+
+            {isRecurring && (
+              <div className="space-y-3 pt-2 border-t border-border-glass/60 animate-fade-in">
+                <div className="flex gap-2">
+                  {[
+                    { id: 'interval', label: 'Every N Days' },
+                    { id: 'weekly', label: 'Weekly' },
+                    { id: 'weekdays', label: 'Weekdays' },
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setRecurrenceType(tab.id)}
+                      className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-semibold border transition ${
+                        recurrenceType === tab.id
+                          ? 'bg-primary text-on-primary border-primary shadow-sm'
+                          : 'bg-surface-container border-border-glass text-on-surface-variant hover:text-on-surface'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {recurrenceType === 'interval' && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-on-surface-variant font-medium">Repeat every</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={90}
+                      value={recurrenceInterval}
+                      onChange={(e) => setRecurrenceInterval(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="w-16 px-2.5 py-1.5 bg-surface-container border border-border-glass rounded-xl text-center text-sm font-bold text-primary font-mono focus:outline-none focus:border-primary"
+                    />
+                    <span className="text-xs text-on-surface-variant font-medium">days</span>
+                  </div>
+                )}
+
+                {recurrenceType === 'weekly' && (
+                  <div className="space-y-1.5">
+                    <span className="text-xs text-on-surface-variant font-medium block">Repeat on days</span>
+                    <div className="grid grid-cols-7 gap-1">
+                      {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((dayChar, i) => {
+                        const isSelected = recurrenceWeekdays.includes(i);
+                        return (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => toggleWeekday(i)}
+                            className={`h-8 rounded-lg text-xs font-bold font-mono transition ${
+                              isSelected
+                                ? 'bg-primary text-on-primary shadow-sm'
+                                : 'bg-surface-container text-on-surface-variant hover:text-on-surface border border-border-glass'
+                            }`}
+                          >
+                            {dayChar}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Notes / Description */}
           <div>
             <label htmlFor="task-notes-input" className="block text-label-md font-label-md text-on-surface mb-1.5 font-semibold">
@@ -270,15 +388,15 @@ export function TaskEditor({ isOpen, onClose, onSave, taskToEdit = null, initial
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl border border-border-glass text-on-surface-variant hover:bg-surface-container text-label-md font-label-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+              className="px-5 py-2.5 rounded-xl border border-border-glass text-on-surface-variant hover:bg-surface-container text-label-md font-label-md transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 bg-primary text-on-primary rounded-xl text-label-md font-label-md font-bold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-glow focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+              className="px-6 py-2.5 bg-primary text-on-primary rounded-xl text-label-md font-label-md font-bold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-glow focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none cursor-pointer"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check</span>
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }} aria-hidden="true">check</span>
               {taskToEdit ? 'Save Changes' : 'Create Task'}
             </button>
           </div>

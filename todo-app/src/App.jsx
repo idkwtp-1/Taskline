@@ -9,10 +9,12 @@ import { BottomNav } from './components/BottomNav';
 import { IosInstallBanner } from './components/IosInstallBanner';
 import { ExitConfirmationModal } from './components/ExitConfirmationModal';
 import { AmbientGlowThemeToggle } from './components/AmbientGlowThemeToggle';
+import { QuickAddBar } from './components/QuickAddBar';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState('today');
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
   const [editorInitialValues, setEditorInitialValues] = useState({});
@@ -48,9 +50,17 @@ export default function App() {
     }
   };
 
-  // Listen for Escape key to trigger exit modal, and Ctrl+Shift+S for Sandbox
+  // Listen for Escape key, Ctrl+Shift+S (Sandbox), and Ctrl+K (Quick Add)
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Ctrl/Cmd + K: Open Quick Add
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        setIsQuickAddOpen(prev => !prev);
+        return;
+      }
+
+      // Ctrl/Cmd + Shift + S: Open UI Sandbox
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'S' || e.key === 's')) {
         e.preventDefault();
         window.location.hash = '#sandbox';
@@ -58,6 +68,10 @@ export default function App() {
       }
 
       if (e.key === 'Escape') {
+        if (isQuickAddOpen) {
+          setIsQuickAddOpen(false);
+          return;
+        }
         if (!isEditorOpen && !isExitModalOpen) {
           e.preventDefault();
           setIsExitModalOpen(true);
@@ -66,7 +80,7 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isEditorOpen, isExitModalOpen]);
+  }, [isEditorOpen, isExitModalOpen, isQuickAddOpen]);
 
   // Task Data Hook
   const {
@@ -131,7 +145,20 @@ export default function App() {
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Natural Language Quick Add Trigger */}
+          <button
+            onClick={() => setIsQuickAddOpen(true)}
+            aria-label="Natural Language Quick Add (Ctrl+K)"
+            className="flex px-3 sm:px-3.5 py-1.5 sm:py-2 bg-primary/15 text-primary border border-primary/30 rounded-xl text-xs sm:text-label-md font-label-md font-bold hover:bg-primary/25 transition items-center gap-1.5 cursor-pointer shadow-sm"
+            title="Quick Add with Natural Language (Ctrl+K)"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }} aria-hidden="true">
+              bolt
+            </span>
+            <span>Quick Add</span>
+          </button>
+
           <button
             onClick={() => handleOpenNewTask()}
             aria-label="Create a new task"
@@ -231,6 +258,14 @@ export default function App() {
         currentTab={currentTab}
         onSelectTab={setCurrentTab}
         onNewTask={handleOpenNewTask}
+      />
+
+      {/* Quick Add Command Bar (Natural Language) */}
+      <QuickAddBar
+        isOpen={isQuickAddOpen}
+        onClose={() => setIsQuickAddOpen(false)}
+        onSaveTask={handleSaveTask}
+        onOpenFullEditor={handleOpenNewTask}
       />
 
       {/* Slide-Over Task Editor Modal */}

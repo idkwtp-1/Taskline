@@ -14,6 +14,31 @@ export function getTodayString() {
 }
 
 /**
+ * Add N days to a YYYY-MM-DD date string
+ */
+export function addDays(dateStr, numDays) {
+  if (!dateStr) return getTodayString();
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const d = new Date(year, month - 1, day);
+  d.setDate(d.getDate() + numDays);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dt = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${dt}`;
+}
+
+/**
+ * Difference in calendar days between dateStrA and dateStrB (B - A)
+ */
+export function daysBetween(dateStrA, dateStrB) {
+  const [y1, m1, d1] = dateStrA.split('-').map(Number);
+  const [y2, m2, d2] = dateStrB.split('-').map(Number);
+  const utc1 = Date.UTC(y1, m1 - 1, d1);
+  const utc2 = Date.UTC(y2, m2 - 1, d2);
+  return Math.round((utc2 - utc1) / (1000 * 60 * 60 * 24));
+}
+
+/**
  * Format a YYYY-MM-DD date string for display, e.g. "Thursday, October 26"
  */
 export function formatDisplayDate(dateStr) {
@@ -90,7 +115,6 @@ export function isBeforeToday(dateStr) {
 
 /**
  * Reset completed state for Daily tasks when date rolls forward to a new day.
- * Reactive reset logic: checks if daily task was completed on a previous day.
  */
 export async function resetDailyTasksIfNeeded(dbInstance) {
   const todayStr = getTodayString();
@@ -110,5 +134,105 @@ export async function resetDailyTasksIfNeeded(dbInstance) {
     }
   } catch (err) {
     console.error('Failed to reset daily tasks:', err);
+  }
+}
+
+/**
+ * Generate matching recurrence dates for a template in a given forward window
+ */
+export function generateRecurrenceDates(template, windowDays = 21) {
+  const todayStr = getTodayString();
+  const startDate = template.recurrenceStartDate || todayStr;
+  const endDate = template.recurrenceEndDate || null;
+  const interval = Math.max(1, Number(template.recurrenceInterval) || 1);
+  const type = template.recurrenceType || 'daily';
+  const weekdays = Array.isArray(template.recurrenceWeekdays) && template.recurrenceWeekdays.length > 0
+    ? template.recurrenceWeekdays
+    : [1, 2, 3, 4, 5]; // default to weekdays
+
+  const dates = [];
+
+  for (let i = 0; i <= windowDays; i++) {
+    const checkDate = addDays(todayStr, i);
+    if (checkDate < startDate) continue;
+    if (endDate && checkDate > endDate) break;
+
+    const [y, m, d] = checkDate.split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    const dayOfWeek = dateObj.getDay(); // 0 = Sun, 1 = Mon ...
+
+    let matches = false;
+
+    if (type === 'daily') {
+      matches = true;
+    } else if (type === 'interval') {
+      const diffFromStart = daysBetween(startDate, checkDate);
+      if (diffFromStart >= 0 && diffFromStart % interval === 0) {
+        matches = true;
+      }
+    } else if (type === 'weekly') {
+      if (weekdays.includes(dayOfWeek)) {
+        matches = true;
+      }
+    } else if (type === 'weekdays') {
+      if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+        matches = true;
+      }
+    }
+
+    if (matches) {
+      dates.push(checkDate);
+    }
+  }
+
+  return dates;
+}
+
+/**
+ * Idempotently synchronize recurring task instances from recurrence templates
+ */
+export async function syncRecurrenceInstances(dbInstance, windowDays = 21) {
+  try {
+    const allTasks = await dbInstance.tasks.toArray();
+    const templates = allTasks.filter((t) => Boolean(t.isRecurrenceTemplate));
+
+    for (const template of templates) {
+      const targetDates = generateRecurrenceDates(template, windowDays);
+      if (targetDates.length === 0) continue;
+
+      // Find existing instances for this template
+      const existing = allTasks.filter(
+        (t) => t.recurrenceParentId === template.id
+      );
+      const existingDateSet = new Set(existing.map((t) => t.dueDate));
+
+      const newInstances = [];
+      for (const dateStr of targetDates) {
+        if (!existingDateSet.has(dateStr)) {
+          newInstances.push({
+            title: template.title,
+            type: 'specific-day',
+            priority: template.priority || 'none',
+            category: template.category || '',
+            completed: false,
+            completedAt: null,
+            dueDate: dateStr,
+            dueTime: template.dueTime || null,
+            duration: Number(template.duration) || 45,
+            createdAt: new Date().toISOString(),
+            lastResetDate: getTodayString(),
+            notes: template.notes || '',
+            recurrenceParentId: template.id,
+            isRecurrenceTemplate: false,
+          });
+        }
+      }
+
+      if (newInstances.length > 0) {
+        await dbInstance.tasks.bulkAdd(newInstances);
+      }
+    }
+  } catch (err) {
+    console.error('Failed to sync recurrence instances:', err);
   }
 }

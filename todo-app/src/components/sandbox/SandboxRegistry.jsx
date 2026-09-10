@@ -11,6 +11,7 @@ import { AmbientGlowThemeToggle } from '../AmbientGlowThemeToggle';
 import { TactileAnimatedCheckbox } from '../TactileAnimatedCheckbox';
 import { ExitConfirmationModal } from '../ExitConfirmationModal';
 import { IosInstallBanner } from '../IosInstallBanner';
+import { QuickAddBar } from '../QuickAddBar';
 import { TodayView } from '../TodayView';
 import { UpcomingView } from '../UpcomingView';
 import { Settings } from '../Settings';
@@ -156,6 +157,48 @@ function InteractiveTaskEditorPreview() {
           setIsOpen(false);
         }}
         taskToEdit={MOCK_TASK_HIGH}
+      />
+    </div>
+  );
+}
+
+// Interactive QuickAddBar Preview
+function InteractiveQuickAddPreview() {
+  const [isOpen, setIsOpen] = useState(true);
+  const [result, setResult] = useState(null);
+
+  return (
+    <div className="p-8 text-center space-y-6">
+      <button
+        onClick={() => setIsOpen(true)}
+        className="px-5 py-2.5 bg-primary text-on-primary rounded-xl font-bold text-sm shadow-glow hover:opacity-90 transition flex items-center gap-1.5 mx-auto cursor-pointer"
+      >
+        <span className="material-symbols-outlined" style={{ fontSize: '18px' }} aria-hidden="true">
+          bolt
+        </span>
+        Open Quick Add Bar
+      </button>
+
+      {result && (
+        <div className="text-left bg-surface-container/80 p-4 rounded-xl border border-border-glass max-w-md mx-auto space-y-2">
+          <span className="text-xs font-bold text-primary block">Last Created Task:</span>
+          <pre className="text-xs font-mono overflow-x-auto text-on-surface">
+            {JSON.stringify(result, null, 2)}
+          </pre>
+        </div>
+      )}
+
+      <QuickAddBar
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onSaveTask={(data) => {
+          setResult(data);
+          setIsOpen(false);
+        }}
+        onOpenFullEditor={(data) => {
+          setResult({ ...data, openedInEditor: true });
+          setIsOpen(false);
+        }}
       />
     </div>
   );
@@ -401,6 +444,13 @@ export function SandboxRegistry() {
     },
 
     // 5. MODALS & SHEETS
+    {
+      id: 'quick-add-bar',
+      name: 'QuickAddBar (Natural Language)',
+      category: 'Modals & Sheets',
+      description: 'Command palette with live entity extraction for dates, times, durations, and recurrence.',
+      render: () => <InteractiveQuickAddPreview />,
+    },
     {
       id: 'task-editor',
       name: 'TaskEditor Drawer',
