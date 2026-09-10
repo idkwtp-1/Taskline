@@ -135,6 +135,39 @@ export function Settings({
           )}
         </div>
 
+        {/* Developer & UI Sandbox */}
+        <div className="bg-surface-container rounded-lg p-6 border border-border-glass">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center shadow-glow">
+                <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>
+                  science
+                </span>
+              </div>
+              <div>
+                <h3 className="text-body-md font-body-md font-semibold text-on-surface">
+                  UI Component Sandbox
+                </h3>
+                <p className="text-body-sm text-on-surface-variant">
+                  Inspect and preview UI components in simulated Mobile, Tablet, and Desktop viewports
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                window.location.hash = '#sandbox';
+              }}
+              className="px-4 py-2 bg-primary text-on-primary rounded-xl text-label-md font-label-md font-bold hover:opacity-90 transition shadow-glow flex items-center gap-1.5 cursor-pointer"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                open_in_new
+              </span>
+              Open Studio
+            </button>
+          </div>
+        </div>
+
         {/* Clear Data Section */}
         <div className="bg-surface-container rounded-lg p-6 border border-outline-variant">
           <div className="flex items-start gap-3 mb-4">

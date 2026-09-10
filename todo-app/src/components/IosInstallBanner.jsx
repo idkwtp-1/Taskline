@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
-export function IosInstallBanner() {
-  const [showBanner, setShowBanner] = useState(false);
+export function IosInstallBanner({ forceShow = false } = {}) {
+  const [showBanner, setShowBanner] = useState(forceShow);
 
   useEffect(() => {
+    if (forceShow) {
+      setShowBanner(true);
+      return;
+    }
     // Detect iOS / iPadOS Safari and check if already running in standalone PWA mode
     const isIos = (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent))) && !window.MSStream;
     const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;

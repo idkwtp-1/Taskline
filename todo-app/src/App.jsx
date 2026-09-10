@@ -48,9 +48,15 @@ export default function App() {
     }
   };
 
-  // Listen for Escape key to trigger exit modal (when editor is not open)
+  // Listen for Escape key to trigger exit modal, and Ctrl+Shift+S for Sandbox
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'S' || e.key === 's')) {
+        e.preventDefault();
+        window.location.hash = '#sandbox';
+        return;
+      }
+
       if (e.key === 'Escape') {
         if (!isEditorOpen && !isExitModalOpen) {
           e.preventDefault();
@@ -132,6 +138,20 @@ export default function App() {
             isDarkMode={isDarkMode}
             onToggleTheme={toggleTheme}
           />
+
+          {/* UI Component Sandbox Trigger */}
+          <button
+            onClick={() => {
+              window.location.hash = '#sandbox';
+            }}
+            aria-label="Open UI Component Sandbox"
+            className="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-xl transition-all duration-200 border border-outline-variant/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none cursor-pointer"
+            title="UI Sandbox Studio (Ctrl+Shift+S)"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+              science
+            </span>
+          </button>
 
           {/* Close App Header Trigger (Desktop Only) */}
           <button
