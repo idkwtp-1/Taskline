@@ -158,22 +158,6 @@ export function DayBlockerAgenda({
             </p>
           </div>
         </div>
-
-        <button
-          onClick={() =>
-            onNewTask({ type: 'specific-day', dueTime: '10:00', duration: 45 })
-          }
-          className="px-2.5 sm:px-3.5 py-1.5 bg-primary/15 text-primary hover:bg-primary/25 border border-primary/30 rounded-xl text-xs sm:text-label-md font-label-md font-bold transition-all flex items-center gap-1 cursor-pointer"
-        >
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: '16px' }}
-            aria-hidden="true"
-          >
-            add
-          </span>
-          <span>Add Block</span>
-        </button>
       </div>
 
       {/* Hourly Canvas Container */}

@@ -48,14 +48,6 @@ export function FlexDock({
             </p>
           </div>
         </div>
-
-        <button
-          onClick={() => onNewTask({ type: 'optional' })}
-          className="px-3 py-1.5 bg-tertiary/15 text-tertiary hover:bg-tertiary/25 border border-tertiary/30 rounded-xl text-label-md font-label-md font-bold transition-all flex items-center gap-1 cursor-pointer"
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>add</span>
-          Add Flex
-        </button>
       </div>
 
       {/* Filter Tabs */}

@@ -146,26 +146,27 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Natural Language Quick Add Trigger */}
+          {/* Sleek Natural Language Command Bar Trigger */}
           <button
             onClick={() => setIsQuickAddOpen(true)}
-            aria-label="Natural Language Quick Add (Ctrl+K)"
-            className="flex px-3 sm:px-3.5 py-1.5 sm:py-2 bg-primary/15 text-primary border border-primary/30 rounded-xl text-xs sm:text-label-md font-label-md font-bold hover:bg-primary/25 transition items-center gap-1.5 cursor-pointer shadow-sm"
+            aria-label="Quick Add task with natural language (Ctrl+K)"
+            className="flex items-center justify-between gap-2 px-3 sm:px-4 py-1.5 bg-surface-container/70 hover:bg-surface-container border border-border-glass hover:border-primary/40 rounded-xl text-xs text-on-surface-variant transition-all cursor-pointer shadow-sm group min-w-[130px] sm:min-w-[220px]"
             title="Quick Add with Natural Language (Ctrl+K)"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }} aria-hidden="true">
-              bolt
-            </span>
-            <span>Quick Add</span>
-          </button>
-
-          <button
-            onClick={() => handleOpenNewTask()}
-            aria-label="Create a new task"
-            className="hidden sm:flex px-4 py-2 bg-primary text-on-primary rounded-xl text-label-md font-label-md font-bold hover:opacity-90 transition-opacity items-center gap-1.5 shadow-glow focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none cursor-pointer"
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }} aria-hidden="true">add</span>
-            New Task
+            <div className="flex items-center gap-2 truncate">
+              <span className="material-symbols-outlined text-primary group-hover:scale-110 transition-transform" style={{ fontSize: '18px' }} aria-hidden="true">
+                bolt
+              </span>
+              <span className="truncate hidden sm:inline text-on-surface-variant/80 group-hover:text-on-surface">
+                Quick add task...
+              </span>
+              <span className="sm:hidden font-medium text-primary">
+                Quick Add
+              </span>
+            </div>
+            <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-bold text-on-surface-variant/60 bg-surface-container-high rounded border border-border-glass">
+              Ctrl K
+            </kbd>
           </button>
 
           {/* Ambient Glow Theme Toggle Switch */}
